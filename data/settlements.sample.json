@@ -1,0 +1,21 @@
+[
+  {
+    "id": "example-001",
+    "name": "Example Consumer Settlement",
+    "company": "ExampleCo",
+    "summary": "Placeholder settlement used only for local development.",
+    "claim_deadline": "2027-01-31",
+    "payout_min": 10,
+    "payout_max": 50,
+    "proof_required": false,
+    "official_source_url": "https://example.com",
+    "official_claim_url": "https://example.com/claim",
+    "eligibility_rules": [
+      {
+        "field": "brands_used",
+        "operator": "contains",
+        "value": "ExampleCo"
+      }
+    ]
+  }
+]
