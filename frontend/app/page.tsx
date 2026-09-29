@@ -41,6 +41,8 @@ export default function Home() {
   const [answers, setAnswers] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [catalog, setCatalog] = useState<Settlement[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(false);
 
   async function runMatch(extraAnswers: Record<string, boolean> = answers) {
     const response = await fetch(API + "/match", {
@@ -92,6 +94,20 @@ export default function Home() {
     }
   }
 
+  async function browseSettlements() {
+    setCatalogLoading(true);
+    setError("");
+    try {
+      const response = await fetch(API + "/settlements");
+      if (!response.ok) throw new Error("Could not load settlements.");
+      setCatalog(await response.json());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setCatalogLoading(false);
+    }
+  }
+
   const relevantMatches = matches.filter((m) => m.status !== "unlikely");
 
   return (
@@ -113,6 +129,28 @@ export default function Home() {
           {loading ? "Checking..." : "Find my settlements"}
         </button>
         {error && <p style={{ color: "#a00" }}>{error}</p>}
+      </section>
+
+      <section style={{ marginTop: 24 }}>
+        <button onClick={browseSettlements} disabled={catalogLoading}
+          style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid #bbb", background: "white", cursor: "pointer" }}>
+          {catalogLoading ? "Loading..." : catalog.length ? "Refresh open settlements" : "Browse verified settlements"}
+        </button>
+        {catalog.length > 0 && (
+          <div style={{ marginTop: 18 }}>
+            <h2>Verified settlement catalog</h2>
+            <p style={{ color: "#666" }}>This catalog is intentionally small while each record is checked against official settlement materials.</p>
+            {catalog.map((settlement) => (
+              <article key={settlement.id} style={{ background: "white", padding: 22, borderRadius: 14, marginTop: 14 }}>
+                <h3 style={{ marginTop: 0 }}>{settlement.name}</h3>
+                <p>{settlement.summary}</p>
+                <p><strong>Claim deadline:</strong> {new Date(settlement.claim_deadline + "T12:00:00").toLocaleDateString()}</p>
+                {settlement.benefit_summary && <p><strong>Potential benefit:</strong> {settlement.benefit_summary}</p>}
+                <a href={settlement.official_source_url} target="_blank" rel="noreferrer">View official settlement details</a>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       {matches.length > 0 && relevantMatches.length === 0 && (
