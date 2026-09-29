@@ -25,6 +25,7 @@ type Settlement = {
   claim_deadline: string;
   payout_min?: number;
   payout_max?: number;
+  benefit_summary?: string;
   proof_required: boolean;
   official_source_url: string;
   official_claim_url?: string;
@@ -133,8 +134,8 @@ export default function Home() {
             <h2>{settlement.name}</h2>
             <p style={{ lineHeight: 1.6 }}>{settlement.summary}</p>
             <p><strong>Claim deadline:</strong> {new Date(settlement.claim_deadline + "T12:00:00").toLocaleDateString()}</p>
-            {(settlement.payout_min || settlement.payout_max) && (
-              <p><strong>Potential benefit:</strong> {settlement.payout_min ? "$" + settlement.payout_min : ""}{settlement.payout_max ? " to $" + settlement.payout_max : ""}</p>
+            {settlement.benefit_summary && (
+              <p><strong>Potential benefit:</strong> {settlement.benefit_summary}</p>
             )}
 
             {missingRules.map((rule) => (
