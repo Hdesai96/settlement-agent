@@ -5,8 +5,8 @@
     "company": "Americold Logistics",
     "summary": "For people in the United States who were notified by Americold that their private information was impacted in its 2020 and/or 2023 data incidents.",
     "claim_deadline": "2026-10-22",
-    "payout_min": 100,
-    "payout_max": 25000,
+    "payout_min": null,
+    "payout_max": null,
     "proof_required": false,
     "official_source_url": "https://www.americoldbracysettlement.com/faq",
     "official_claim_url": "https://forms.ksacms.com/efiling/fr/eform/AmericoldBracySettlement_claimform/new?form-version=1",
@@ -22,7 +22,8 @@
         "value": true,
         "question": "Did Americold notify you that your private information was impacted in its 2020 and/or 2023 data incident?"
       }
-    ]
+    ],
+    "benefit_summary": "Estimated residual cash payment of $100 for one affected incident or $200 for both incidents; documented out-of-pocket losses may be reimbursed up to $25,000, subject to the settlement terms."
   },
   {
     "id": "onq-financial-2026",
@@ -30,8 +31,8 @@
     "company": "On Q Financial",
     "summary": "For individuals whose private information may have been compromised in the On Q Financial data security incident on or around February 20, 2024.",
     "claim_deadline": "2026-10-28",
-    "payout_min": 50,
-    "payout_max": 5000,
+    "payout_min": null,
+    "payout_max": null,
     "proof_required": false,
     "official_source_url": "https://onqsettlement.com/faq",
     "official_claim_url": "https://forms.ksacms.com/efiling/fr/eform/feathers_v_onq_claimform/new?form-version=1",
@@ -47,7 +48,8 @@
         "value": true,
         "question": "Were you told, or do you otherwise know, that your private information may have been compromised in the On Q Financial data security incident around February 20, 2024?"
       }
-    ]
+    ],
+    "benefit_summary": "Alternative cash payment estimated at $50, or reimbursement of documented ordinary and extraordinary losses up to $5,000, subject to the settlement terms."
   },
   {
     "id": "roseland-hospital-2026",
@@ -55,8 +57,8 @@
     "company": "Roseland Community Hospital",
     "summary": "For individuals whose private information was potentially compromised in Roseland Community Hospital's June 2024 data incident and who were sent an individual notification.",
     "claim_deadline": "2026-12-31",
-    "payout_min": 50,
-    "payout_max": 5000,
+    "payout_min": null,
+    "payout_max": null,
     "proof_required": false,
     "official_source_url": "https://www.roselandsettlement.com/faq",
     "official_claim_url": "https://forms.ksacms.com/efiling/fr/eform/hallvroselandcommunityhospital_claimform/new?form-version=1",
@@ -72,6 +74,7 @@
         "value": true,
         "question": "Did Roseland Community Hospital send you an individual notification that your private information may have been affected by its June 2024 data incident?"
       }
-    ]
+    ],
+    "benefit_summary": "Pro-rata cash payment estimated at $50, or reimbursement of documented ordinary and extraordinary losses up to $5,000, subject to the settlement terms."
   }
 ]
