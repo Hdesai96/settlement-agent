@@ -1,12 +1,13 @@
 from datetime import date
 from typing import List, Optional
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class EligibilityRule(BaseModel):
     field: str
     operator: str
     value: str | int | float | bool | list[str]
+    question: Optional[str] = None
 
 
 class Settlement(BaseModel):
@@ -20,13 +21,13 @@ class Settlement(BaseModel):
     proof_required: bool
     official_source_url: HttpUrl
     official_claim_url: Optional[HttpUrl] = None
-    eligibility_rules: List[EligibilityRule] = []
+    eligibility_rules: List[EligibilityRule] = Field(default_factory=list)
 
 
 class UserProfile(BaseModel):
     state: Optional[str] = None
-    brands_used: List[str] = []
-    answers: dict[str, str | int | float | bool | list[str]] = {}
+    brands_used: List[str] = Field(default_factory=list)
+    answers: dict[str, str | int | float | bool | list[str]] = Field(default_factory=dict)
 
 
 class MatchResult(BaseModel):
