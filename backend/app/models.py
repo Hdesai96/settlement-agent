@@ -18,6 +18,7 @@ class Settlement(BaseModel):
     claim_deadline: date
     payout_min: Optional[float] = None
     payout_max: Optional[float] = None
+    benefit_summary: Optional[str] = None
     proof_required: bool
     official_source_url: HttpUrl
     official_claim_url: Optional[HttpUrl] = None
