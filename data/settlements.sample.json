@@ -42,10 +42,10 @@
         "value": "On Q Financial"
       },
       {
-        "field": "received_onq_notice",
+        "field": "onq_info_impacted",
         "operator": "equals",
         "value": true,
-        "question": "Were you notified that your private information may have been affected by the On Q Financial data security incident?"
+        "question": "Were you told, or do you otherwise know, that your private information may have been compromised in the On Q Financial data security incident around February 20, 2024?"
       }
     ]
   },
