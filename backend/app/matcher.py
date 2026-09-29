@@ -19,7 +19,7 @@ def _evaluate_rule(rule, profile: UserProfile):
 
     if rule.operator == "contains":
         if isinstance(actual, list):
-            return str(expected).lower() in [str(x).lower() for x in actual]
+            return any(str(expected).lower() in str(x).lower() for x in actual)
         return str(expected).lower() in str(actual).lower()
 
     if rule.operator == "in":
