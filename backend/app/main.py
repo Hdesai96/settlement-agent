@@ -45,3 +45,12 @@ def match_profile(profile: UserProfile):
     settlements = load_settlements()
     results = [match_settlement(settlement, profile) for settlement in settlements]
     return {"matches": results}
+
+
+@app.get("/settlements/{settlement_id}", response_model=Settlement)
+def get_settlement(settlement_id: str):
+    for settlement in load_settlements():
+        if settlement.id == settlement_id:
+            return settlement
+    from fastapi import HTTPException
+    raise HTTPException(status_code=404, detail="Settlement not found")
