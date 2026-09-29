@@ -11,8 +11,17 @@
     "official_source_url": "https://www.americoldbracysettlement.com/faq",
     "official_claim_url": "https://forms.ksacms.com/efiling/fr/eform/AmericoldBracySettlement_claimform/new?form-version=1",
     "eligibility_rules": [
-      {"field": "brands_used", "operator": "contains", "value": "Americold"},
-      {"field": "received_americold_notice", "operator": "equals", "value": true}
+      {
+        "field": "brands_used",
+        "operator": "contains",
+        "value": "Americold"
+      },
+      {
+        "field": "received_americold_notice",
+        "operator": "equals",
+        "value": true,
+        "question": "Did Americold notify you that your private information was impacted in its 2020 and/or 2023 data incident?"
+      }
     ]
   },
   {
@@ -27,8 +36,17 @@
     "official_source_url": "https://onqsettlement.com/faq",
     "official_claim_url": "https://forms.ksacms.com/efiling/fr/eform/feathers_v_onq_claimform/new?form-version=1",
     "eligibility_rules": [
-      {"field": "brands_used", "operator": "contains", "value": "On Q Financial"},
-      {"field": "received_onq_notice", "operator": "equals", "value": true}
+      {
+        "field": "brands_used",
+        "operator": "contains",
+        "value": "On Q Financial"
+      },
+      {
+        "field": "received_onq_notice",
+        "operator": "equals",
+        "value": true,
+        "question": "Were you notified that your private information may have been affected by the On Q Financial data security incident?"
+      }
     ]
   },
   {
@@ -43,8 +61,17 @@
     "official_source_url": "https://www.roselandsettlement.com/faq",
     "official_claim_url": "https://forms.ksacms.com/efiling/fr/eform/hallvroselandcommunityhospital_claimform/new?form-version=1",
     "eligibility_rules": [
-      {"field": "brands_used", "operator": "contains", "value": "Roseland Community Hospital"},
-      {"field": "received_roseland_notice", "operator": "equals", "value": true}
+      {
+        "field": "brands_used",
+        "operator": "contains",
+        "value": "Roseland Community Hospital"
+      },
+      {
+        "field": "received_roseland_notice",
+        "operator": "equals",
+        "value": true,
+        "question": "Did Roseland Community Hospital send you an individual notification that your private information may have been affected by its June 2024 data incident?"
+      }
     ]
   }
 ]
