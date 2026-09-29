@@ -1,21 +1,50 @@
 [
   {
-    "id": "example-001",
-    "name": "Example Consumer Settlement",
-    "company": "ExampleCo",
-    "summary": "Placeholder settlement used only for local development.",
-    "claim_deadline": "2027-01-31",
-    "payout_min": 10,
-    "payout_max": 50,
+    "id": "americold-bracy-2026",
+    "name": "Americold Data Incident Settlement",
+    "company": "Americold Logistics",
+    "summary": "For people in the United States who were notified by Americold that their private information was impacted in its 2020 and/or 2023 data incidents.",
+    "claim_deadline": "2026-10-22",
+    "payout_min": 100,
+    "payout_max": 25000,
     "proof_required": false,
-    "official_source_url": "https://example.com",
-    "official_claim_url": "https://example.com/claim",
+    "official_source_url": "https://www.americoldbracysettlement.com/faq",
+    "official_claim_url": "https://forms.ksacms.com/efiling/fr/eform/AmericoldBracySettlement_claimform/new?form-version=1",
     "eligibility_rules": [
-      {
-        "field": "brands_used",
-        "operator": "contains",
-        "value": "ExampleCo"
-      }
+      {"field": "brands_used", "operator": "contains", "value": "Americold"},
+      {"field": "received_americold_notice", "operator": "equals", "value": true}
+    ]
+  },
+  {
+    "id": "onq-financial-2026",
+    "name": "On Q Financial Data Security Settlement",
+    "company": "On Q Financial",
+    "summary": "For individuals whose private information may have been compromised in the On Q Financial data security incident on or around February 20, 2024.",
+    "claim_deadline": "2026-10-28",
+    "payout_min": 50,
+    "payout_max": 5000,
+    "proof_required": false,
+    "official_source_url": "https://onqsettlement.com/faq",
+    "official_claim_url": "https://forms.ksacms.com/efiling/fr/eform/feathers_v_onq_claimform/new?form-version=1",
+    "eligibility_rules": [
+      {"field": "brands_used", "operator": "contains", "value": "On Q Financial"},
+      {"field": "received_onq_notice", "operator": "equals", "value": true}
+    ]
+  },
+  {
+    "id": "roseland-hospital-2026",
+    "name": "Roseland Community Hospital Data Incident Settlement",
+    "company": "Roseland Community Hospital",
+    "summary": "For individuals whose private information was potentially compromised in Roseland Community Hospital's June 2024 data incident and who were sent an individual notification.",
+    "claim_deadline": "2026-12-31",
+    "payout_min": 50,
+    "payout_max": 5000,
+    "proof_required": false,
+    "official_source_url": "https://www.roselandsettlement.com/faq",
+    "official_claim_url": "https://forms.ksacms.com/efiling/fr/eform/hallvroselandcommunityhospital_claimform/new?form-version=1",
+    "eligibility_rules": [
+      {"field": "brands_used", "operator": "contains", "value": "Roseland Community Hospital"},
+      {"field": "received_roseland_notice", "operator": "equals", "value": true}
     ]
   }
 ]
