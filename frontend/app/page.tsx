@@ -43,6 +43,8 @@ export default function Home() {
   const [error, setError] = useState("");
   const [catalog, setCatalog] = useState<Settlement[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogSearch, setCatalogSearch] = useState("");
+  const [deadlineFilter, setDeadlineFilter] = useState("all");
 
   async function runMatch(extraAnswers: Record<string, boolean> = answers) {
     const response = await fetch(API + "/match", {
@@ -108,6 +110,18 @@ export default function Home() {
     }
   }
 
+  const visibleCatalog = catalog.filter((s) => {
+    const term = catalogSearch.trim().toLowerCase();
+    const matchesText = !term || [s.name, s.company, s.summary].some((value) => value.toLowerCase().includes(term));
+    const deadline = new Date(s.claim_deadline + "T23:59:59");
+    const now = new Date();
+    const daysLeft = (deadline.getTime() - now.getTime()) / 86400000;
+    const matchesDeadline = deadlineFilter === "all" ||
+      (deadlineFilter === "open" && daysLeft >= 0) ||
+      (deadlineFilter === "30" && daysLeft >= 0 && daysLeft <= 30);
+    return matchesText && matchesDeadline;
+  }).sort((a, b) => a.claim_deadline.localeCompare(b.claim_deadline));
+
   const relevantMatches = matches.filter((m) => m.status !== "unlikely");
 
   return (
@@ -140,7 +154,21 @@ export default function Home() {
           <div style={{ marginTop: 18 }}>
             <h2>Verified settlement catalog</h2>
             <p style={{ color: "#666" }}>This catalog is intentionally small while each record is checked against official settlement materials.</p>
-            {catalog.map((settlement) => (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, margin: "20px 0" }}>
+              <input aria-label="Search settlements" placeholder="Search company or settlement"
+                value={catalogSearch} onChange={(e) => setCatalogSearch(e.target.value)}
+                style={{ flex: "1 1 230px", padding: 12, borderRadius: 9, border: "1px solid #bbb" }} />
+              <select aria-label="Filter by deadline" value={deadlineFilter}
+                onChange={(e) => setDeadlineFilter(e.target.value)}
+                style={{ padding: 12, borderRadius: 9, border: "1px solid #bbb" }}>
+                <option value="all">All deadlines</option>
+                <option value="open">Still open</option>
+                <option value="30">Due within 30 days</option>
+              </select>
+            </div>
+            <p aria-live="polite">{visibleCatalog.length} settlement{visibleCatalog.length === 1 ? "" : "s"} found</p>
+            {visibleCatalog.length === 0 && <p>No settlements match these filters.</p>}
+            {visibleCatalog.map((settlement) => (
               <article key={settlement.id} style={{ background: "white", padding: 22, borderRadius: 14, marginTop: 14 }}>
                 <h3 style={{ marginTop: 0 }}>{settlement.name}</h3>
                 <p>{settlement.summary}</p>
