@@ -17,6 +17,7 @@ def main():
     for name in ("id", "title", "source-url"):
         add.add_argument("--" + name, required=True)
     sub.add_parser("list")
+    sub.add_parser("scan")
     review = sub.add_parser("review")
     review.add_argument("--id", required=True)
     review.add_argument("--official-source-url", required=True)
@@ -27,6 +28,12 @@ def main():
     if args.action == "add":
         candidate = DiscoveryCandidate(id=args.id, title=args.title, source_url=args.source_url)
         print("Candidate queued" if save_candidate(candidate) else "Duplicate candidate skipped")
+    elif args.action == "scan":
+        from app.source_connector import discover_from_feed
+        try:
+            print(json.dumps(discover_from_feed(), indent=2))
+        except Exception as exc:
+            parser.error(f"Feed scan failed: {exc}")
     elif args.action == "list":
         print(json.dumps([c.model_dump(mode="json") for c in load_candidates()], indent=2))
     else:
