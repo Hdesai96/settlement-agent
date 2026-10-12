@@ -90,12 +90,10 @@ def discover_from_feed() -> dict:
         candidate = DiscoveryCandidate(
             id="directory-" + hashlib.sha256(link.encode("utf-8")).hexdigest()[:16],
             title=title[:250],
-            source_url=SOURCE_URL,
+            source_url=SOURCE_URL + "?candidate=directory-" + hashlib.sha256(link.encode("utf-8")).hexdigest()[:16],
             official_source_url=link,
             proposed_deadline=due,
         )
-        # save_candidate deduplicates source_url too; use a distinct per-item source URL
-        candidate.source_url = SOURCE_URL + "?candidate=" + candidate.id
         if save_candidate(candidate):
             added += 1
     return {"source": SOURCE_URL, "items_seen": len(parser.entries), "dated_leads_found": eligible, "candidates_added": added}
