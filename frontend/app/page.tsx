@@ -2,6 +2,16 @@
 
 import { useState } from "react";
 
+type DiscoveryCandidate = {
+  id: string;
+  title: string;
+  source_url: string;
+  official_source_url?: string | null;
+  proposed_deadline?: string | null;
+  review_status: string;
+  reviewer_notes: string;
+};
+
 type Match = {
   settlement_id: string;
   settlement_name: string;
@@ -43,6 +53,9 @@ export default function Home() {
   const [error, setError] = useState("");
   const [catalog, setCatalog] = useState<Settlement[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
+  const [candidates, setCandidates] = useState<DiscoveryCandidate[] | null>(null);
+  const [reviewError, setReviewError] = useState("");
+  const [reviewLoading, setReviewLoading] = useState(false);
   const [catalogSearch, setCatalogSearch] = useState("");
   const [deadlineFilter, setDeadlineFilter] = useState("all");
 
@@ -121,6 +134,20 @@ export default function Home() {
       (deadlineFilter === "30" && daysLeft >= 0 && daysLeft <= 30);
     return matchesText && matchesDeadline;
   }).sort((a, b) => a.claim_deadline.localeCompare(b.claim_deadline));
+
+  async function loadReviewQueue() {
+    setReviewLoading(true);
+    setReviewError("");
+    try {
+      const response = await fetch(API + "/discovery/candidates");
+      if (!response.ok) throw new Error("Could not load the review queue.");
+      setCandidates(await response.json());
+    } catch (err) {
+      setReviewError(err instanceof Error ? err.message : "Could not load candidates.");
+    } finally {
+      setReviewLoading(false);
+    }
+  }
 
   const relevantMatches = matches.filter((m) => m.status !== "unlikely");
 
@@ -224,6 +251,32 @@ export default function Home() {
           </article>
         );
       })}
+
+      {process.env.NODE_ENV === "development" && (
+        <section style={{ marginTop: 36, padding: 24, border: "1px solid #ddd", borderRadius: 14 }}>
+          <h2>Discovery Review Queue (local development)</h2>
+          <p>Unverified candidates are kept separate from the public catalog. This screen does not approve or publish records.</p>
+          <button onClick={loadReviewQueue} disabled={reviewLoading} style={{ padding: "10px 16px" }}>
+            {reviewLoading ? "Loading..." : "Load review queue"}
+          </button>
+          {reviewError && <p role="alert" style={{ color: "#a00" }}>{reviewError}</p>}
+          {candidates !== null && (
+            <div style={{ marginTop: 18 }}>
+              <p>{candidates.length} candidate{candidates.length === 1 ? "" : "s"} awaiting or undergoing review</p>
+              {candidates.map((candidate) => (
+                <article key={candidate.id} style={{ background: "white", borderRadius: 10, padding: 16, marginTop: 12 }}>
+                  <h3>{candidate.title}</h3>
+                  <p><strong>Status:</strong> {candidate.review_status}</p>
+                  <p><strong>Proposed deadline:</strong> {candidate.proposed_deadline || "Not checked"}</p>
+                  <p><a href={candidate.source_url} target="_blank" rel="noreferrer">Discovery source</a></p>
+                  {candidate.official_source_url && <p><a href={candidate.official_source_url} target="_blank" rel="noreferrer">Official source</a></p>}
+                  {candidate.reviewer_notes && <p><strong>Reviewer notes:</strong> {candidate.reviewer_notes}</p>}
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       <p style={{ fontSize: 13, color: "#666", marginTop: 30, lineHeight: 1.5 }}>
         Settlement Agent provides matching assistance, not legal advice. A match is not a determination of legal entitlement. Review the official settlement materials before submitting a claim.
