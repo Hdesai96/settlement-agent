@@ -1,45 +1,101 @@
-"""Collect potential settlement leads from a public RSS feed.
+"""Review-only settlement leads from ClassAction.org's open settlements listing.
 
-A discovered article is never automatically published as a verified settlement.
+The directory is a lead source. Deadlines and official URLs require human review.
 """
+from datetime import date, datetime
+from html.parser import HTMLParser
 import hashlib
+import re
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
-import xml.etree.ElementTree as ET
 
 from app.discovery import DiscoveryCandidate, save_candidate
 
-FEED_URL = "https://www.classaction.org/blog/rss"
-ALLOWED_HOSTS = {"classaction.org", "www.classaction.org"}
+SOURCE_URL = "https://www.classaction.org/settlements"
+ALLOWED = {"classaction.org", "www.classaction.org"}
 
 
-def discover_from_feed(feed_url: str = FEED_URL) -> dict:
-    parsed = urlparse(feed_url)
-    if parsed.scheme != "https" or parsed.hostname not in ALLOWED_HOSTS:
-        raise ValueError("Unsupported feed URL")
-    request = Request(feed_url, headers={"User-Agent": "SettlementAgentResearch/0.1"})
-    with urlopen(request, timeout=15) as response:
-        final_url = urlparse(response.geturl())
-        if final_url.scheme != "https" or final_url.hostname not in ALLOWED_HOSTS:
-            raise ValueError("Unexpected feed redirect")
-        payload = response.read(2_000_001)
-    if len(payload) > 2_000_000:
-        raise ValueError("Feed is too large")
-    root = ET.fromstring(payload)
-    items = root.findall(".//item")
+class SettlementListParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.in_h3 = False
+        self.in_link = False
+        self.current = None
+        self.entries = []
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if tag == "h3":
+            if self.current:
+                self.entries.append(self.current)
+            self.current = {"title": "", "url": "", "body": ""}
+            self.in_h3 = True
+        elif tag == "a" and self.in_h3 and self.current is not None:
+            self.in_link = True
+            self.current["url"] = attributes.get("href", "")
+
+    def handle_endtag(self, tag):
+        if tag == "h3":
+            self.in_h3 = False
+            self.in_link = False
+        elif tag == "a":
+            self.in_link = False
+
+    def handle_data(self, data):
+        if self.current is None:
+            return
+        if self.in_h3:
+            self.current["title"] += data
+        else:
+            self.current["body"] += " " + data
+
+    def close(self):
+        super().close()
+        if self.current:
+            self.entries.append(self.current)
+
+
+def discover_from_feed() -> dict:
+    request = Request(SOURCE_URL, headers={"User-Agent": "SettlementAgentResearch/0.1"})
+    with urlopen(request, timeout=20) as response:
+        destination = urlparse(response.geturl())
+        if destination.scheme != "https" or destination.hostname not in ALLOWED:
+            raise ValueError("Unexpected source redirect")
+        payload = response.read(3_000_001)
+    if len(payload) > 3_000_000:
+        raise ValueError("Source page exceeds size limit")
+    parser = SettlementListParser()
+    parser.feed(payload.decode("utf-8", errors="replace"))
+    parser.close()
     added = 0
-    for item in items[:100]:
-        title = (item.findtext("title") or "").strip()
-        link = (item.findtext("link") or "").strip()
-        link_parts = urlparse(link)
-        if ("settlement" not in title.lower() or link_parts.scheme != "https"
-                or link_parts.hostname not in ALLOWED_HOSTS):
+    eligible = 0
+    for entry in parser.entries:
+        title = " ".join(entry["title"].split())
+        link = entry["url"].strip()
+        parsed = urlparse(link)
+        if not title.lower().endswith("class action settlement"):
             continue
+        if parsed.scheme != "https" or not parsed.hostname or parsed.hostname in ALLOWED:
+            continue
+        deadline = re.search(r"Deadline\s+(\d{1,2}/\d{1,2}/\d{2,4})", entry["body"], re.I)
+        if not deadline:
+            continue
+        try:
+            due = datetime.strptime(deadline.group(1), "%m/%d/%y").date() if len(deadline.group(1).split("/")[-1]) == 2 else datetime.strptime(deadline.group(1), "%m/%d/%Y").date()
+        except ValueError:
+            continue
+        if due < date.today():
+            continue
+        eligible += 1
         candidate = DiscoveryCandidate(
-            id="rss-" + hashlib.sha256(link.encode("utf-8")).hexdigest()[:16],
+            id="directory-" + hashlib.sha256(link.encode("utf-8")).hexdigest()[:16],
             title=title[:250],
-            source_url=link,
+            source_url=SOURCE_URL,
+            official_source_url=link,
+            proposed_deadline=due,
         )
+        # save_candidate deduplicates source_url too; use a distinct per-item source URL
+        candidate.source_url = SOURCE_URL + "?candidate=" + candidate.id
         if save_candidate(candidate):
             added += 1
-    return {"source": feed_url, "items_seen": len(items), "candidates_added": added}
+    return {"source": SOURCE_URL, "items_seen": len(parser.entries), "dated_leads_found": eligible, "candidates_added": added}
