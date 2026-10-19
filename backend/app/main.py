@@ -1,7 +1,8 @@
 import json
+import os
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import HTTPException, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.discovery import DiscoveryCandidate, load_candidates, save_candidate
@@ -60,13 +61,16 @@ def get_settlement(settlement_id: str):
 @app.get("/discovery/candidates", response_model=list[DiscoveryCandidate])
 def list_discovery_candidates():
     """Local prototype only: protect this route with admin authentication before deployment."""
+    if os.getenv("ENABLE_LOCAL_REVIEW_API") != "1":
+        raise HTTPException(status_code=404, detail="Review API disabled")
     return load_candidates()
 
 
 @app.post("/discovery/candidates", status_code=201)
 def add_discovery_candidate(candidate: DiscoveryCandidate):
     """Local prototype only: do not expose this unauthenticated route publicly."""
-    from fastapi import HTTPException
+    if os.getenv("ENABLE_LOCAL_REVIEW_API") != "1":
+        raise HTTPException(status_code=404, detail="Review API disabled")
     if not save_candidate(candidate):
         raise HTTPException(status_code=409, detail="Candidate already exists")
     return {"status": "queued", "id": candidate.id}
