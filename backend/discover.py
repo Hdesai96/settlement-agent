@@ -18,6 +18,8 @@ def main():
         add.add_argument("--" + name, required=True)
     sub.add_parser("list")
     sub.add_parser("scan")
+    verify = sub.add_parser("verify")
+    verify.add_argument("--id", required=True)
     review = sub.add_parser("review")
     review.add_argument("--id", required=True)
     review.add_argument("--official-source-url", required=True)
@@ -34,6 +36,12 @@ def main():
             print(json.dumps(discover_from_feed(), indent=2))
         except Exception as exc:
             parser.error(f"Feed scan failed: {exc}")
+    elif args.action == "verify":
+        from verify import inspect
+        try:
+            print(json.dumps(inspect(args.id), indent=2))
+        except Exception as exc:
+            parser.error(str(exc))
     elif args.action == "list":
         print(json.dumps([c.model_dump(mode="json") for c in load_candidates()], indent=2))
     else:
