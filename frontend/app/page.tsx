@@ -152,137 +152,105 @@ export default function Home() {
   const relevantMatches = matches.filter((m) => m.status !== "unlikely");
   const today = new Date().toLocaleDateString("en-CA");
 
+  const displayDate = (value: string) => new Date(value + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const isExpired = (value: string) => value < new Date().toLocaleDateString("sv-SE");
+
   return (
-    <main style={{ maxWidth: 860, margin: "0 auto", padding: "72px 24px" }}>
-      <p style={{ fontSize: 14, textTransform: "uppercase", letterSpacing: 1.5 }}>Settlement Agent</p>
-      <h1 style={{ fontSize: 52, lineHeight: 1.05, marginBottom: 18 }}>Find money you may already be entitled to.</h1>
-      <p style={{ fontSize: 19, lineHeight: 1.6, maxWidth: 680 }}>
-        Enter companies or organizations you have used. We check structured eligibility rules from official settlement sources.
-      </p>
+    <main className="site-shell">
+      <header className="topbar">
+        <div className="brand"><span className="brand-mark">S</span> Settlement Agent</div>
+        <div className="topbar-right"><span className="status-dot" /> Independent settlement discovery</div>
+      </header>
 
-      <section style={{ background: "white", padding: 28, borderRadius: 18, marginTop: 36, boxShadow: "0 8px 30px rgba(0,0,0,0.06)" }}>
-        <label htmlFor="brands" style={{ display: "block", fontWeight: 700, marginBottom: 10 }}>Companies or organizations</label>
-        <input id="brands" value={brands} onChange={(e) => setBrands(e.target.value)}
-          placeholder="Try Americold, On Q Financial, or Roseland Community Hospital"
-          style={{ width: "100%", boxSizing: "border-box", padding: 14, borderRadius: 10, border: "1px solid #ccc", fontSize: 16 }} />
-        <p style={{ fontSize: 13, color: "#666" }}>Separate multiple names with commas.</p>
-        <button onClick={findSettlements} disabled={loading || !brands.trim()}
-          style={{ padding: "14px 22px", borderRadius: 10, border: 0, fontSize: 16, cursor: "pointer", background: "#111", color: "white", opacity: loading || !brands.trim() ? 0.5 : 1 }}>
-          {loading ? "Checking..." : "Find my settlements"}
-        </button>
-        {error && <p style={{ color: "#a00" }}>{error}</p>}
+      <section className="hero">
+        <div>
+          <div className="eyebrow">Your settlement discovery assistant</div>
+          <h1>Find claims you <span>might qualify for.</span></h1>
+          <p>Search verified settlement records, answer eligibility questions, and review official claim instructions. Stay in control of every step.</p>
+        </div>
+        <div className="hero-visual" aria-label="How Settlement Agent works">
+          <small>A clearer way to claim</small>
+          <strong>Discover. Check. Claim.</strong>
+          <p>Explore potential settlements with a guided, permission-first experience.</p>
+          <div className="visual-steps"><span>01 Discover</span><span>02 Verify</span><span>03 Review</span></div>
+        </div>
       </section>
 
-      <section style={{ marginTop: 24 }}>
-        <button onClick={browseSettlements} disabled={catalogLoading}
-          style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid #bbb", background: "white", cursor: "pointer" }}>
-          {catalogLoading ? "Loading..." : catalog.length ? "Refresh open settlements" : "Browse verified settlements"}
-        </button>
-        {catalog.length > 0 && (
-          <div style={{ marginTop: 18 }}>
-            <h2>Verified settlement catalog</h2>
-            <p style={{ color: "#666" }}>This catalog is intentionally small while each record is checked against official settlement materials.</p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 12, margin: "20px 0" }}>
-              <input aria-label="Search settlements" placeholder="Search company or settlement"
-                value={catalogSearch} onChange={(e) => setCatalogSearch(e.target.value)}
-                style={{ flex: "1 1 230px", padding: 12, borderRadius: 9, border: "1px solid #bbb" }} />
-              <select aria-label="Filter by deadline" value={deadlineFilter}
-                onChange={(e) => setDeadlineFilter(e.target.value)}
-                style={{ padding: 12, borderRadius: 9, border: "1px solid #bbb" }}>
-                <option value="all">All deadlines</option>
-                <option value="open">Still open</option>
-                <option value="30">Due within 30 days</option>
-              </select>
-            </div>
-            <p aria-live="polite">{visibleCatalog.length} settlement{visibleCatalog.length === 1 ? "" : "s"} found</p>
-            {visibleCatalog.length === 0 && <p>No settlements match these filters.</p>}
-            {visibleCatalog.map((settlement) => (
-              <article key={settlement.id} style={{ background: "white", padding: 22, borderRadius: 14, marginTop: 14 }}>
-                <h3 style={{ marginTop: 0 }}>{settlement.name}</h3>
-                <p>{settlement.summary}</p>
-                <p><strong>Claim deadline:</strong> {new Date(settlement.claim_deadline + "T12:00:00").toLocaleDateString()}</p>
-                {settlement.claim_deadline < today && <p style={{ color: "#a00" }}>Listed deadline has passed. Check the official website for updates.</p>}
-                {settlement.benefit_summary && <p><strong>Potential benefit:</strong> {settlement.benefit_summary}</p>}
-                <a href={settlement.official_source_url} target="_blank" rel="noreferrer">View official settlement details</a>
-              </article>
-            ))}
+      <section className="search-panel" aria-labelledby="search-heading">
+        <h2 className="section-title" id="search-heading">Check your potential matches</h2>
+        <p className="section-subtitle">Enter companies or organizations you have interacted with.</p>
+        <label className="field-label" htmlFor="brands">Companies or organizations</label>
+        <input id="brands" value={brands} onChange={(e) => setBrands(e.target.value)} placeholder="e.g. Americold, On Q Financial" style={{ width:"100%",padding:15,border:"1px solid #cfdce9",borderRadius:11 }} />
+        <div className="search-actions">
+          <button className="primary-btn" onClick={findSettlements} disabled={loading || !brands.trim()}>{loading ? "Checking..." : "Find my settlements →"}</button>
+          <span className="hint">Separate multiple company names with commas.</span>
+        </div>
+        {error && <p role="alert" style={{color:"#aa3030"}}>{error}</p>}
+      </section>
+
+      <section className="catalog-section">
+        <div className="section-header">
+          <div><div className="eyebrow">Verified records</div><h2 className="section-title">Explore settlements</h2><p className="section-subtitle">A curated catalog based on reviewed settlement records.</p></div>
+          <button className="secondary-btn" onClick={browseSettlements} disabled={catalogLoading}>{catalogLoading ? "Loading..." : catalog.length ? "Refresh catalog" : "Browse settlements →"}</button>
+        </div>
+        {catalog.length > 0 && <>
+          <div className="catalog-controls">
+            <input aria-label="Search settlements" placeholder="Search settlements or companies" value={catalogSearch} onChange={(e) => setCatalogSearch(e.target.value)} />
+            <select aria-label="Filter by deadline" value={deadlineFilter} onChange={(e) => setDeadlineFilter(e.target.value)}>
+              <option value="all">All deadlines</option><option value="open">Still open</option><option value="30">Due within 30 days</option>
+            </select>
           </div>
-        )}
+          <p className="hint" aria-live="polite">{visibleCatalog.length} settlement{visibleCatalog.length === 1 ? "" : "s"} found</p>
+          <div className="catalog-grid">
+            {visibleCatalog.map(s => <article className="catalog-card" key={s.id}>
+              <span className={"deadline-pill" + (isExpired(s.claim_deadline) ? " expired" : "")}>{isExpired(s.claim_deadline) ? "Deadline passed" : "Claim deadline: " + displayDate(s.claim_deadline)}</span>
+              <h3>{s.name}</h3><p>{s.summary}</p>
+              {s.benefit_summary && <p><strong>Potential benefit:</strong> {s.benefit_summary}</p>}
+              <a className="card-link" href={s.official_source_url} target="_blank" rel="noopener noreferrer">View settlement details ↗</a>
+            </article>)}
+          </div>
+          {visibleCatalog.length === 0 && <p>No settlements match your filters.</p>}
+        </>}
       </section>
 
-      {matches.length > 0 && relevantMatches.length === 0 && (
-        <section style={{ marginTop: 28, background: "white", padding: 24, borderRadius: 16 }}>
-          <h2 style={{ marginTop: 0 }}>No matches in our current database</h2>
-          <p>We only have a small verified set right now. This does not mean you are not eligible for other settlements.</p>
-        </section>
-      )}
+      {matches.length > 0 && <section className="results-section">
+        <div className="eyebrow">Your results</div><h2 className="section-title">Potential matches</h2>
+        {relevantMatches.length === 0 && <div className="match-card"><h3>No matches in this catalog</h3><p>Based on the information entered, no current records matched. This does not determine eligibility for other settlements.</p></div>}
+        {relevantMatches.map(match => {
+          const s = details[match.settlement_id]; if (!s) return null;
+          const missing = s.eligibility_rules.filter(rule => match.missing_fields.includes(rule.field));
+          return <article className="match-card" key={match.settlement_id}>
+            <span className="deadline-pill">{match.status === "likely" ? "Likely match based on answers" : "More information needed"}</span>
+            <h3>{s.name}</h3><p>{s.summary}</p><p><strong>Deadline:</strong> {displayDate(s.claim_deadline)}</p>
+            {s.benefit_summary && <p><strong>Potential benefit:</strong> {s.benefit_summary}</p>}
+            {missing.map(rule => <div className="question" key={rule.field}><p><strong>{rule.question || "Please confirm this eligibility requirement."}</strong></p><button onClick={() => answer(rule.field,true)}>Yes</button><button onClick={() => answer(rule.field,false)}>No</button></div>)}
+            {match.status === "likely" && !isExpired(s.claim_deadline) && s.official_claim_url && <div className="search-actions"><a className="primary-btn" style={{textDecoration:"none"}} href={s.official_claim_url} target="_blank" rel="noopener noreferrer">Open official claim form ↗</a><a href={s.official_source_url} target="_blank" rel="noopener noreferrer">Review official details</a></div>}
+            {isExpired(s.claim_deadline) && <p role="status">The listed deadline has passed. Check the official source for updates.</p>}
+          </article>;
+        })}
+      </section>}
 
-      {relevantMatches.map((match) => {
-        const settlement = details[match.settlement_id];
-        if (!settlement) return null;
-        const missingRules = settlement.eligibility_rules.filter((r) => match.missing_fields.includes(r.field));
-        return (
-          <article key={match.settlement_id} style={{ background: "white", padding: 26, borderRadius: 16, marginTop: 24 }}>
-            <p style={{ textTransform: "uppercase", fontSize: 12, letterSpacing: 1.2, color: "#666" }}>
-              {match.status === "likely" ? "Likely match based on your answers" : "Possible match"}
-            </p>
-            <h2>{settlement.name}</h2>
-            <p style={{ lineHeight: 1.6 }}>{settlement.summary}</p>
-            <p><strong>Claim deadline:</strong> {new Date(settlement.claim_deadline + "T12:00:00").toLocaleDateString()}</p>
-            {settlement.benefit_summary && (
-              <p><strong>Potential benefit:</strong> {settlement.benefit_summary}</p>
-            )}
+      <section className="claim-panel" aria-labelledby="assistant-heading">
+        <div className="eyebrow">Coming next · Claim assistant</div>
+        <h2 id="assistant-heading">Your claim. Your permission.</h2>
+        <p>We're building a guided filing assistant that can prepare information for your review. Automated submission is not available yet. You will always review the specific claim and authorize any submission before it happens.</p>
+        <div className="claim-steps"><div className="claim-step"><strong>01 · Prepare</strong>Collect eligibility answers and required documents.</div><div className="claim-step"><strong>02 · Review</strong>Confirm every detail and declaration.</div><div className="claim-step"><strong>03 · Authorize</strong>Approve a specific submission and receive a receipt.</div></div>
+        <p className="hint">No claims are filed automatically by this version of the app.</p>
+      </section>
 
-            {missingRules.map((rule) => (
-              <div key={rule.field} style={{ marginTop: 22, paddingTop: 18, borderTop: "1px solid #eee" }}>
-                <p style={{ fontWeight: 700 }}>{rule.question || "Please confirm this eligibility requirement."}</p>
-                <button onClick={() => answer(rule.field, true)} style={{ padding: "10px 18px", marginRight: 10 }}>Yes</button>
-                <button onClick={() => answer(rule.field, false)} style={{ padding: "10px 18px" }}>No</button>
-              </div>
-            ))}
+      {process.env.NODE_ENV === "development" && <section className="review-panel">
+        <div className="eyebrow">Developer tools · Local only</div><h2 className="section-title">Discovery review queue</h2>
+        <p className="section-subtitle">Unverified leads remain separate from the published catalog. This screen does not approve or publish them.</p>
+        <button className="secondary-btn" onClick={loadReviewQueue} disabled={reviewLoading}>{reviewLoading ? "Loading..." : "Load review queue"}</button>
+        {reviewError && <p role="alert" style={{color:"#aa3030"}}>{reviewError}</p>}
+        {candidates !== null && <div className="review-list"><p className="hint">{candidates.length} discovery candidates</p>{candidates.map(candidate => <article className="review-item" key={candidate.id}>
+          <h3>{candidate.title}</h3><p>Status: {candidate.review_status} · Proposed deadline: {candidate.proposed_deadline || "Not checked"}</p>
+          <p><a href="https://www.classaction.org/settlements" target="_blank" rel="noopener noreferrer">Discovery directory ↗</a>{candidate.official_source_url && <> · <a href={candidate.official_source_url} target="_blank" rel="noopener noreferrer">Candidate website ↗</a></>}</p>
+          {candidate.reviewer_notes && <p>Notes: {candidate.reviewer_notes}</p>}
+        </article>)}</div>}
+      </section>}
 
-            {match.status === "likely" && settlement.claim_deadline >= today && settlement.official_claim_url && (
-              <div style={{ marginTop: 22 }}>
-                <a href={settlement.official_claim_url} target="_blank" rel="noreferrer"
-                  style={{ display: "inline-block", padding: "12px 18px", background: "#111", color: "white", borderRadius: 9, textDecoration: "none", marginRight: 12 }}>
-                  Go to official claim form
-                </a>
-                <a href={settlement.official_source_url} target="_blank" rel="noreferrer">Verify official settlement details</a>
-              </div>
-            )}
-          </article>
-        );
-      })}
-
-      {process.env.NODE_ENV === "development" && (
-        <section style={{ marginTop: 36, padding: 24, border: "1px solid #ddd", borderRadius: 14 }}>
-          <h2>Discovery Review Queue (local development)</h2>
-          <p>Unverified candidates are kept separate from the public catalog. This screen does not approve or publish records.</p>
-          <button onClick={loadReviewQueue} disabled={reviewLoading} style={{ padding: "10px 16px" }}>
-            {reviewLoading ? "Loading..." : "Load review queue"}
-          </button>
-          {reviewError && <p role="alert" style={{ color: "#a00" }}>{reviewError}</p>}
-          {candidates !== null && (
-            <div style={{ marginTop: 18 }}>
-              <p>{candidates.length} candidate{candidates.length === 1 ? "" : "s"} awaiting or undergoing review</p>
-              {candidates.map((candidate) => (
-                <article key={candidate.id} style={{ background: "white", borderRadius: 10, padding: 16, marginTop: 12 }}>
-                  <h3>{candidate.title}</h3>
-                  <p><strong>Status:</strong> {candidate.review_status}</p>
-                  <p><strong>Proposed deadline:</strong> {candidate.proposed_deadline || "Not checked"}</p>
-                  <p><a href="https://www.classaction.org/settlements" target="_blank" rel="noreferrer">Discovery directory</a></p>
-                  {candidate.official_source_url && <p><a href={candidate.official_source_url} target="_blank" rel="noreferrer">Official source</a></p>}
-                  {candidate.reviewer_notes && <p><strong>Reviewer notes:</strong> {candidate.reviewer_notes}</p>}
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-
-      <p style={{ fontSize: 13, color: "#666", marginTop: 30, lineHeight: 1.5 }}>
-        Settlement Agent provides matching assistance, not legal advice. A match is not a determination of legal entitlement. Review the official settlement materials before submitting a claim.
-      </p>
+      <footer className="site-footer">Settlement Agent provides informational matching assistance, not legal advice. A potential match is not a determination of legal entitlement. Verify all requirements and deadlines with the settlement administrator before filing.</footer>
     </main>
   );
 }
