@@ -7,6 +7,7 @@ Then: python discover.py review --id ... --official-source-url ... --deadline YY
 import argparse
 import json
 from datetime import date
+from pydantic import HttpUrl
 from app.discovery import CANDIDATES_PATH, DiscoveryCandidate, load_candidates, save_candidate
 
 
@@ -51,7 +52,7 @@ def main():
             parser.error("Candidate not found")
         if not args.notes.strip():
             parser.error("Reviewer notes are required")
-        candidate.official_source_url = args.official_source_url
+        candidate.official_source_url = HttpUrl(args.official_source_url)
         candidate.proposed_deadline = args.deadline
         candidate.reviewer_notes = args.notes
         candidate.review_status = "reviewed"
