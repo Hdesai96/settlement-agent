@@ -1,14 +1,10 @@
+import "./globals.css";
+
 export const metadata = {
-  title: "Settlement Agent",
-  description: "Find settlements you may qualify for and understand what you need to claim them.",
+  title: "Settlement Agent | Find and review eligible claims",
+  description: "Explore verified class action settlements, check potential eligibility, and prepare claims with explicit consent.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return (
-    <html lang="en">
-      <body style={{ margin: 0, fontFamily: "Arial, sans-serif", background: "#f7f7f5", color: "#111" }}>
-        {children}
-      </body>
-    </html>
-  );
+  return <html lang="en"><body>{children}</body></html>;
 }
