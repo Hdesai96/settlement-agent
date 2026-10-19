@@ -150,6 +150,7 @@ export default function Home() {
   }
 
   const relevantMatches = matches.filter((m) => m.status !== "unlikely");
+  const today = new Date().toLocaleDateString("en-CA");
 
   return (
     <main style={{ maxWidth: 860, margin: "0 auto", padding: "72px 24px" }}>
@@ -200,6 +201,7 @@ export default function Home() {
                 <h3 style={{ marginTop: 0 }}>{settlement.name}</h3>
                 <p>{settlement.summary}</p>
                 <p><strong>Claim deadline:</strong> {new Date(settlement.claim_deadline + "T12:00:00").toLocaleDateString()}</p>
+                {settlement.claim_deadline < today && <p style={{ color: "#a00" }}>Listed deadline has passed. Check the official website for updates.</p>}
                 {settlement.benefit_summary && <p><strong>Potential benefit:</strong> {settlement.benefit_summary}</p>}
                 <a href={settlement.official_source_url} target="_blank" rel="noreferrer">View official settlement details</a>
               </article>
@@ -239,7 +241,7 @@ export default function Home() {
               </div>
             ))}
 
-            {match.status === "likely" && (
+            {match.status === "likely" && settlement.claim_deadline >= today && settlement.official_claim_url && (
               <div style={{ marginTop: 22 }}>
                 <a href={settlement.official_claim_url} target="_blank" rel="noreferrer"
                   style={{ display: "inline-block", padding: "12px 18px", background: "#111", color: "white", borderRadius: 9, textDecoration: "none", marginRight: 12 }}>
@@ -268,7 +270,7 @@ export default function Home() {
                   <h3>{candidate.title}</h3>
                   <p><strong>Status:</strong> {candidate.review_status}</p>
                   <p><strong>Proposed deadline:</strong> {candidate.proposed_deadline || "Not checked"}</p>
-                  <p><a href={candidate.source_url} target="_blank" rel="noreferrer">Discovery source</a></p>
+                  <p><a href="https://www.classaction.org/settlements" target="_blank" rel="noreferrer">Discovery directory</a></p>
                   {candidate.official_source_url && <p><a href={candidate.official_source_url} target="_blank" rel="noreferrer">Official source</a></p>}
                   {candidate.reviewer_notes && <p><strong>Reviewer notes:</strong> {candidate.reviewer_notes}</p>}
                 </article>
